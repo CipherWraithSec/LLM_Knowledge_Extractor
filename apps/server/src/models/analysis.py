@@ -1,28 +1,34 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
 from typing import List, Optional
-# from app.services.analysis import analyze_text, search_analyses
-
-router = APIRouter()
+from pydantic import BaseModel, Field
 
 
-class AnalyzeRequest(BaseModel):
-    text: str
+class AnalysisRequest(BaseModel):
+    text: str = Field(
+        min_length=1, description="The unstructured text to be analyzed.")
 
 
-class AnalyzeResponse(BaseModel):
+class AnalysisResult(BaseModel):
+    id: int
     title: Optional[str]
     topics: List[str]
     sentiment: str
     keywords: List[str]
+    summary: str
     confidence_score: Optional[float]
+    createdAt: str
 
 
 class SearchResponse(BaseModel):
-    analyses: List[AnalyzeResponse]
+    analyses: List[AnalysisResult]
 
 
-@router.post("/analyze", response_model=AnalyzeResponse)
+# from fastapi import APIRouter, HTTPException
+# from app.services.analysis import analyze_text, search_analyses
+
+# router = APIRouter()
+
+
+# @router.post("/analyze", response_model=AnalyzeResponse)
 # async def analyze(request: AnalyzeRequest):
 #     if not request.text.strip():
 #         raise HTTPException(status_code=400, detail="Input text cannot be empty.")
@@ -31,7 +37,7 @@ class SearchResponse(BaseModel):
 #         return result
 #     except Exception as e:
 #         raise HTTPException(status_code=500, detail=str(e))
-@router.get("/search", response_model=SearchResponse)
+# @router.get("/search", response_model=SearchResponse)
 # async def search(topic: str):
 #     try:
 #         results = await search_analyses(topic)

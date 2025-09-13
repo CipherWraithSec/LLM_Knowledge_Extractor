@@ -20,11 +20,11 @@ async def analyze_text(
 
     # Performs text analysis using the provided AnalysisService.processes it with an LLM, stores the results and returns them.
     if not request.text:
-        # Input validation is crucial for robustness.
+        # Input validation
         logger.warning("Received empty text input.")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Input text cannot be empty."
+            content={"message": "Input text cannot be empty."}
         )
 
     try:
