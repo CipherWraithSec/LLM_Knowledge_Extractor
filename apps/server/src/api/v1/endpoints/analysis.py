@@ -5,7 +5,7 @@ from fastapi.responses import StreamingResponse
 from prisma import errors as prisma_errors
 
 from ....models.analysis import AnalysisRequest, AnalysisResult
-from ....api.v1.deps import get_analysis_service
+from ..dependencies import get_analysis_service
 from ....services.analysis_service import AnalysisService
 from ....core.logging import logger
 
