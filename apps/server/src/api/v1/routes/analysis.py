@@ -11,6 +11,8 @@ from ....core.logging import logger
 
 analysis_router = APIRouter(tags=["analysis"])
 
+# POST /analyze
+
 
 @analysis_router.post("/analyze", response_model=AnalysisResult)
 async def analyze_text(
@@ -24,7 +26,7 @@ async def analyze_text(
         logger.warning("Received empty text input.")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Input text cannot be empty."}
+            detail={"message": "Input text cannot be empty."}
         )
 
     try:
@@ -40,15 +42,14 @@ async def analyze_text(
         )
 
 
+# GET /search
 @analysis_router.get("/search", response_model=List[AnalysisResult])
 async def search_analyses(
     topic: str = Query(
         None, description="Search analyses by a key topic or keyword."),
     analysis_service: AnalysisService = Depends(get_analysis_service)
 ):
-    """
-    Searches for stored analyses matching a given topic or keyword.
-    """
+    # Searches for stored analyses matching a given topic or keyword.
     # Delegate the search logic to the service layer.
     analyses = await analysis_service.search_analyses(topic)
     return [AnalysisResult.model_validate(res) for res in analyses]

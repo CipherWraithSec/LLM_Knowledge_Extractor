@@ -1,5 +1,6 @@
-# Import prisma from the main endpoint file, or better, from a database module.
-from ..v1.endpoints.analysis import prisma
+from fastapi import Depends
+from ...db.database import prisma
+
 from ...services.analysis_service import AnalysisService
 from ...services.llm_client import LLMClient
 from ...utils.keywords import extract_nouns

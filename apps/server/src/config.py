@@ -1,9 +1,14 @@
+# apps/server/src/config.py
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from dotenv import load_dotenv, find_dotenv
+
+# Find and load .env file
+load_dotenv(find_dotenv())
 
 
 class Settings(BaseSettings):
-    # Configuration for the application, loaded from environment variables.
-    model_config = SettingsConfigDict(env_file='.env', extra='ignore')
+    # With the file already loaded, we don't need env_file anymore
+    model_config = SettingsConfigDict(extra='ignore')
 
     database_url: str
     llm_api_key: str

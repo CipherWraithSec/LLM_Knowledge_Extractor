@@ -19,8 +19,12 @@ RUN poetry config virtualenvs.create false \
 # Copy application code
 COPY . .
 
-# Download the spaCy model
-RUN python -m spacy download en_core_web_sm
+# Copy local SpaCy model if available, otherwise download it
+RUN if [ -d "./models/en_core_web_sm" ]; then \
+        echo "Using local SpaCy model"; \
+    else \
+        echo "Downloading SpaCy model..." && python -m spacy download en_core_web_sm; \
+    fi
 
 # Install Node.js for Prisma CLI and OpenSSL for Prisma Engine
 RUN apk add --no-cache nodejs npm openssl openssl-dev libc6-compat

@@ -29,7 +29,8 @@ class LLMClient:
                 "summary": "This is a mock summary of the provided text, used for testing and development purposes. It simulates a fast, perfect response.",
                 "title": "Mock Analysis Title",
                 "topics": ["mocking", "testing", "development"],
-                "sentiment": "neutral"
+                "sentiment": "neutral",
+                "confidence_score": 0.95  # High confidence for mock data
             }
             yield json.dumps(mock_data)
             return
@@ -46,11 +47,12 @@ class LLMClient:
                         "content": (
                             "You are a knowledge extractor. "
                             "You will receive a block of text and must return a JSON object. "
-                            "The JSON must have three keys: 'summary', 'title', 'topics', and 'sentiment'."
+                            "The JSON must have these keys: 'summary', 'title', 'topics', 'sentiment', and 'confidence_score'. "
                             "The summary should be 1-2 sentences. "
-                            "The title should be extracted from the text if available. "
+                            "The title should be extracted from the text if available (or null if none). "
                             "The topics array should contain 3 key topics from the text. "
-                            "The sentiment must be one of 'positive', 'neutral', or 'negative'."
+                            "The sentiment must be one of 'positive', 'neutral', or 'negative'. "
+                            "The confidence_score should be a float between 0.0 and 1.0 indicating your confidence in the analysis. "
                             "Return only the raw JSON, without any other commentary."
                         )
                     },

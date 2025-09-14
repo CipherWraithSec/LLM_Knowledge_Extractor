@@ -8,14 +8,21 @@ class AnalysisRequest(BaseModel):
 
 
 class AnalysisResult(BaseModel):
+    """Model representing the result of text analysis.
+    
+    This model matches the database schema and is used for API responses.
+    All optional fields use proper typing without default initialization
+    to avoid potential data inconsistencies.
+    """
     id: int
-    title: Optional[str]
-    topics: List[str]
-    sentiment: str
-    keywords: List[str]
-    summary: str
-    confidence_score: Optional[float]
-    createdAt: str
+    title: Optional[str]  # Can be None if LLM doesn't provide a title
+    topics: List[str]     # Array of topic strings from LLM
+    sentiment: str        # Required sentiment classification 
+    keywords: List[str]   # Array of keywords from SpaCy extraction
+    summary: str          # Required summary text from LLM
+    original_text: Optional[str]      # Original input text (optional)
+    confidence_score: Optional[float] # Analysis confidence (optional)
+    createdAt: str        # Timestamp of when analysis was created
 
 
 class SearchResponse(BaseModel):

@@ -1,8 +1,6 @@
-"""Business logic for text analysis and database operations."""
-
 import json
 from prisma import Prisma
-from typing import Callable, List, Dict, Any, Type
+from typing import Callable, List, Dict, Any
 from ..services.llm_client import LLMClient
 from ..models.analysis import AnalysisResult
 from ..core.logging import logger
@@ -17,7 +15,7 @@ class AnalysisService:
         self.llm_client = llm_client
         self.keyword_extractor = keyword_extractor
 
-    async def perform_analysis(self, text: str) -> Type[AnalysisResult]:
+    async def perform_analysis(self, text: str) -> Dict[str, Any]:
 
         logger.info("Starting analysis for input text.")
 
@@ -44,12 +42,16 @@ class AnalysisService:
 
         # 4. Persist the analysis to the database.
         try:
+            # Prepare the data to be saved - includes both LLM output and extracted keywords
             analysis_data = {
                 "summary": llm_output.get("summary", ""),
-                "title": llm_output.get("title"),
+                "title": llm_output.get("title"),  # Can be None
                 "topics": llm_output.get("topics", []),
                 "sentiment": llm_output.get("sentiment", "unknown"),
                 "keywords": keywords,
+                "original_text": text,  # Store the original input text for reference
+                "confidence_score": llm_output.get("confidence_score"),  # LLM confidence if provided
+                # Note: createdAt is handled by database default
             }
             analysis = await self.prisma.analysis.create(data=analysis_data)
         except Exception as e:
@@ -60,7 +62,7 @@ class AnalysisService:
         logger.info(f"Successfully performed and saved analysis for text.")
         return analysis
 
-    async def search_analyses(self, query: str) -> List[Type[AnalysisResult]]:
+    async def search_analyses(self, query: str) -> List[Dict[str, Any]]:
         # Search database for analyses based on a topic or keyword.
         logger.info(f"Searching analyses for query: '{query}'.")
 

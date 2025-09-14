@@ -1,18 +1,20 @@
 generator client {
-    provider = "prisma-client-py"
+  provider = "prisma-client-py"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Analysis {
-    id        Int      @id @default(autoincrement())
-    title     String?
-    topics    String[]
-    sentiment String
-    keywords  String[]
-    summary   String
-    createdAt DateTime @default(now())
+  id               Int      @id @default(autoincrement())
+  title            String?
+  topics           String[]
+  sentiment        String
+  keywords         String[]
+  summary          String
+  createdAt        DateTime @default(now())
+  confidence_score Float?
+  original_text    String?
 }
