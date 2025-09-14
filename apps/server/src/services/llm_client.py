@@ -59,6 +59,8 @@ class LLMClient:
                     },
                     {"role": "user", "content": text}
                 ],
+                max_tokens=settings.llm_max_tokens,
+                temperature=settings.llm_temperature,
                 stream=True,
                 response_format={"type": "json_object"}
             )

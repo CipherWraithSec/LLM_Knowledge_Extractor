@@ -3,7 +3,7 @@ from typing import AsyncGenerator, Dict
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 
-from utils.logging import setup_logging, logger
+from src.utils.logging import setup_logging, logger
 from src.db.database import connect_to_db, disconnect_from_db, DatabaseError, prisma
 from src.api.v1.routes.analysis import analysis_router as analysis_v1_router
 from src.utils.errors import StandardError

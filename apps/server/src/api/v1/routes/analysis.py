@@ -32,7 +32,7 @@ async def analyze_text(
         return AnalysisResult.model_validate(analysis)
     except Exception as e:
         # Any unexpected errors from the service layer.
-        logger.error(f"Analysis failed: {e}", exc_info=True)
+        logger.error("Analysis failed: {}", str(e), exc_info=True)
         raise analysis_failed_error()
 
 

@@ -62,7 +62,8 @@ class AnalysisService:
             raise database_error()
 
         logger.info(f"Successfully performed and saved analysis for text.")
-        return analysis
+        # Convert Prisma object to dict for the API response
+        return analysis.model_dump()
 
     async def search_analyses(self, query: str) -> List[Dict[str, Any]]:
         # Search database for analyses based on a topic or keyword.
@@ -82,4 +83,5 @@ class AnalysisService:
         analyses = await self.prisma.analysis.find_many(where=where_clause)
 
         logger.info(f"Found {len(analyses)} analyses for query: '{query}'.")
-        return analyses
+        # Convert Prisma objects to dicts for the API response
+        return [analysis.model_dump() for analysis in analyses]

@@ -1,7 +1,7 @@
 import sys
 from prisma import Prisma, errors as prisma_errors
-from utils.logging import logger
-from src.utils.errors import database_error
+from ..utils.logging import logger
+from ..utils.errors import database_error
 
 # Global Prisma client instance for the application.
 prisma = Prisma()

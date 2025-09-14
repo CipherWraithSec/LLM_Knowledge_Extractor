@@ -1,4 +1,5 @@
 from typing import List, Optional
+from datetime import datetime
 from pydantic import BaseModel, Field
 
 
@@ -16,7 +17,7 @@ class AnalysisResult(BaseModel):
     summary: str
     original_text: Optional[str]
     confidence_score: Optional[float]
-    createdAt: str
+    createdAt: datetime
 
 
 class SearchResponse(BaseModel):
