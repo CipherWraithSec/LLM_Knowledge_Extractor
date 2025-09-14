@@ -3,7 +3,8 @@ from prisma import Prisma
 from typing import Callable, List, Dict, Any
 from ..services.llm_client import LLMClient
 from ..models.analysis import AnalysisResult
-from ..core.logging import logger
+from ..utils.logging import logger
+from ..utils.errors import llm_unavailable_error, database_error
 
 
 class AnalysisService:
@@ -26,14 +27,14 @@ class AnalysisService:
                 full_response += chunk
         except Exception as e:
             logger.error(f"LLM streaming failed: {e}", exc_info=True)
-            raise e
+            raise llm_unavailable_error()
 
         # 2. Parse the LLM's streaming response.
         try:
             llm_output = json.loads(full_response)
         except json.JSONDecodeError:
             logger.error(f"Failed to parse LLM JSON: {full_response}")
-            raise ValueError("Failed to parse LLM response as JSON.")
+            raise llm_unavailable_error()
 
         # 3. Perform local, CPU-bound keyword extraction.
         # Performance optimization to avoid using the LLM for a
@@ -50,14 +51,15 @@ class AnalysisService:
                 "sentiment": llm_output.get("sentiment", "unknown"),
                 "keywords": keywords,
                 "original_text": text,  # Store the original input text for reference
-                "confidence_score": llm_output.get("confidence_score"),  # LLM confidence if provided
+                # LLM confidence if provided
+                "confidence_score": llm_output.get("confidence_score"),
                 # Note: createdAt is handled by database default
             }
             analysis = await self.prisma.analysis.create(data=analysis_data)
         except Exception as e:
             logger.error(
                 f"Failed to save analysis to database: {e}", exc_info=True)
-            raise e
+            raise database_error()
 
         logger.info(f"Successfully performed and saved analysis for text.")
         return analysis

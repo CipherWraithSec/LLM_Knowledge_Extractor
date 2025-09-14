@@ -7,13 +7,13 @@ from prisma import errors as prisma_errors
 from ....models.analysis import AnalysisRequest, AnalysisResult
 from ..dependencies import get_analysis_service
 from ....services.analysis_service import AnalysisService
-from ....core.logging import logger
+from ....utils.logging import logger
+from ....utils.errors import empty_text_error, analysis_failed_error
 
 analysis_router = APIRouter(tags=["analysis"])
 
+
 # POST /analyze
-
-
 @analysis_router.post("/analyze", response_model=AnalysisResult)
 async def analyze_text(
     request: AnalysisRequest,
@@ -21,25 +21,19 @@ async def analyze_text(
 ):
 
     # Performs text analysis using the provided AnalysisService.processes it with an LLM, stores the results and returns them.
-    if not request.text:
+    if not request.text.strip():
         # Input validation
         logger.warning("Received empty text input.")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"message": "Input text cannot be empty."}
-        )
+        raise empty_text_error()
 
     try:
         # Delegate the core logic to the service layer.
         analysis = await analysis_service.perform_analysis(request.text)
         return AnalysisResult.model_validate(analysis)
     except Exception as e:
-        # Catch any unexpected errors from the service layer.
+        # Any unexpected errors from the service layer.
         logger.error(f"Analysis failed: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
-        )
+        raise analysis_failed_error()
 
 
 # GET /search

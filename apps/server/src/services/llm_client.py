@@ -4,11 +4,12 @@ import json
 from typing import AsyncGenerator
 from openai import AsyncOpenAI
 from ..config import settings
-from ..core.logging import logger
+from ..utils.logging import logger
+from ..utils.errors import llm_unavailable_error
 
 
 class LLMClient:
-    # Client for interacting with the LLM (OpenAI) API. Supports streaming responses.
+
     # Uses a mock implementation for testing and a real client for production.
     def __init__(self, api_key: str, mock_enabled: bool):
         self.mock_enabled = mock_enabled
@@ -75,4 +76,4 @@ class LLMClient:
 
         except Exception as e:
             logger.error(f"Error calling OpenAI API: {e}", exc_info=True)
-            raise e
+            raise llm_unavailable_error()

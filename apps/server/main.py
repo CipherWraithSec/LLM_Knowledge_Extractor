@@ -2,11 +2,11 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator, Dict
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 
-from src.core.logging import setup_logging, logger
+from utils.logging import setup_logging, logger
 from src.db.database import connect_to_db, disconnect_from_db, DatabaseError, prisma
 from src.api.v1.routes.analysis import analysis_router as analysis_v1_router
+from src.utils.errors import StandardError
 
 # Setup logging configuration
 setup_logging()
@@ -49,32 +49,16 @@ app.add_middleware(
 app.include_router(analysis_v1_router, prefix="/api/v1")
 
 
-# @app.get("/analyses")
-# async def get_analyses():
-#     """Fetch all Analysis records from the database."""
-#     results = await prisma.analysis.find_many()
-#     return results
-
-# GET /
-
-
 @app.get("/")
 async def index() -> dict[str, str]:
-    """Health check endpoint to verify server is running.
-    
-    Returns:
-        dict: Simple status message indicating server is operational
-    """
+    # Basic health check
     return {"message": "Server is running"}
 
 
-# Global exception handler to catch unhandled exceptions and return a consistent JSON response.
+# Global exception handler for unhandled exceptions
 @app.exception_handler(Exception)
-async def general_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-
+async def general_exception_handler(request: Request, exc: Exception):
     logger.error(
         f"Internal Server Error for request {request.url}: {exc}", exc_info=True)
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"message": "Internal server error"},
-    )
+    # Use the standardized error approach
+    raise StandardError.internal_error("Internal server error")

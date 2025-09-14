@@ -4,7 +4,7 @@ from ...db.database import prisma
 from ...services.analysis_service import AnalysisService
 from ...services.llm_client import LLMClient
 from ...utils.keywords import extract_nouns
-from ...core.logging import logger
+from ...utils.logging import logger
 from ...config import settings
 
 

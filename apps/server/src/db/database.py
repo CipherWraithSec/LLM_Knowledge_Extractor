@@ -1,6 +1,7 @@
 import sys
 from prisma import Prisma, errors as prisma_errors
-from src.core.logging import logger
+from utils.logging import logger
+from src.utils.errors import database_error
 
 # Global Prisma client instance for the application.
 prisma = Prisma()
@@ -18,13 +19,11 @@ async def connect_to_db() -> None:
         logger.info("Database connection established.")
     except prisma_errors.PrismaError as e:
         logger.error(f"Prisma error: {e}")
-        raise DatabaseError(
-            "Failed to connect to the database via Prisma.") from e
+        raise database_error()
     except Exception as e:
         logger.error(
             f"An unexpected error occurred during database connection: {e}")
-        raise DatabaseError(
-            "An unexpected error occurred during database connection.") from e
+        raise database_error()
 
 
 async def disconnect_from_db() -> None:
