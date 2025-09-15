@@ -1,59 +1,69 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
-import { X, Loader2 } from 'lucide-react'
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { X, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
-import { analysisAPI } from '@/lib/api'
-import { Analysis, AnalysisRequestSchema, SENTIMENT_EMOJIS, getConfidenceColor, formatDate } from '@/lib/types'
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { analysisAPI } from "@/lib/api";
+import {
+  Analysis,
+  AnalysisRequestSchema,
+  SENTIMENT_EMOJIS,
+  getConfidenceColor,
+  formatDate,
+} from "@/lib/types";
 
 interface AnalysisModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onAnalysisComplete?: (analysis: Analysis) => void
+  isOpen: boolean;
+  onClose: () => void;
+  onAnalysisComplete?: (analysis: Analysis) => void;
 }
 
-export function AnalysisModal({ isOpen, onClose, onAnalysisComplete }: AnalysisModalProps) {
-  const [text, setText] = useState('')
-  const [result, setResult] = useState<Analysis | null>(null)
+export function AnalysisModal({
+  isOpen,
+  onClose,
+  onAnalysisComplete,
+}: AnalysisModalProps) {
+  const [text, setText] = useState("");
+  const [result, setResult] = useState<Analysis | null>(null);
 
   const analysisMutation = useMutation({
     mutationFn: analysisAPI.analyze,
     onSuccess: (data) => {
-      setResult(data)
-      onAnalysisComplete?.(data)
+      setResult(data);
+      onAnalysisComplete?.(data);
     },
     onError: (error) => {
-      console.error('Analysis failed:', error)
+      console.error("Analysis failed:", error);
     },
-  })
+  });
 
   const handleAnalyze = () => {
     // Validate input
     try {
-      const validatedData = AnalysisRequestSchema.parse({ text })
-      analysisMutation.mutate(validatedData)
+      const validatedData = AnalysisRequestSchema.parse({ text });
+      analysisMutation.mutate(validatedData);
     } catch (error) {
-      console.error('Validation failed:', error)
+      console.error("Validation failed:", error);
     }
-  }
+  };
 
   const handleClose = () => {
-    setText('')
-    setResult(null)
-    analysisMutation.reset()
-    onClose()
-  }
+    setText("");
+    setResult(null);
+    analysisMutation.reset();
+    onClose();
+  };
 
-  const isAnalyzing = analysisMutation.isPending
+  const isAnalyzing = analysisMutation.isPending;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -73,7 +83,7 @@ export function AnalysisModal({ isOpen, onClose, onAnalysisComplete }: AnalysisM
         <div className="flex flex-col space-y-4 overflow-y-auto flex-1 min-h-0">
           {/* Description */}
           <div className="text-center text-gray-600 px-4">
-            Input your text below, and our system will provide analysis including topics, sentiment, and summary!
+            Input your text below, and our system will provide summary and more!
           </div>
 
           {/* Text Input Area - Top Section */}
@@ -100,7 +110,7 @@ export function AnalysisModal({ isOpen, onClose, onAnalysisComplete }: AnalysisM
                   Analyzing...
                 </>
               ) : (
-                'Analyze Text'
+                "Analyze Text"
               )}
             </Button>
           </div>
@@ -114,10 +124,18 @@ export function AnalysisModal({ isOpen, onClose, onAnalysisComplete }: AnalysisM
                   <h3 className="text-lg font-semibold">Analysis Results</h3>
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-1">
-                      <span className="text-2xl">{SENTIMENT_EMOJIS[result.sentiment]}</span>
-                      <span className="capitalize font-medium">{result.sentiment}</span>
+                      <span className="text-2xl">
+                        {SENTIMENT_EMOJIS[result.sentiment]}
+                      </span>
+                      <span className="capitalize font-medium">
+                        {result.sentiment}
+                      </span>
                     </div>
-                    <div className={`font-medium ${getConfidenceColor(result.confidence_score)}`}>
+                    <div
+                      className={`font-medium ${getConfidenceColor(
+                        result.confidence_score
+                      )}`}
+                    >
                       {result.confidence_score.toFixed(1)}% Confidence
                     </div>
                   </div>
@@ -133,10 +151,16 @@ export function AnalysisModal({ isOpen, onClose, onAnalysisComplete }: AnalysisM
 
                 {/* Topics */}
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">🏷️ Topics:</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">
+                    🏷️ Topics:
+                  </h4>
                   <div className="flex flex-wrap gap-2 max-h-[120px] overflow-y-auto">
                     {result.topics.map((topic, index) => (
-                      <Badge key={index} variant="secondary" className="bg-blue-100 text-blue-800 flex-shrink-0">
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="bg-blue-100 text-blue-800 flex-shrink-0"
+                      >
                         {topic}
                       </Badge>
                     ))}
@@ -145,9 +169,11 @@ export function AnalysisModal({ isOpen, onClose, onAnalysisComplete }: AnalysisM
 
                 {/* Keywords */}
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">🔑 Keywords:</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">
+                    🔑 Keywords:
+                  </h4>
                   <div className="text-gray-600 max-h-[80px] overflow-y-auto">
-                    {result.keywords.join(' • ')}
+                    {result.keywords.join(" • ")}
                   </div>
                 </div>
 
@@ -172,5 +198,5 @@ export function AnalysisModal({ isOpen, onClose, onAnalysisComplete }: AnalysisM
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
