@@ -2,10 +2,12 @@
 
 import { Header } from "@/components/Header";
 import { AnalysisModal } from "@/components/AnalysisModal";
+import { AnalysisDetailModal } from "@/components/AnalysisDetailModal";
 import { AnalysisCard } from "@/components/AnalysisCard";
 import { Analysis } from "@/lib/types";
 import { useAppDispatch } from "@/app/hooks/redux";
 import { useSearch, setQuery } from "@/lib/redux/features/search/searchSlice";
+import { openModal } from "@/lib/redux/features/analysisDetail/analysisDetailSlice";
 import { useAnalysisQuery } from "@/app/hooks/useAnalysis";
 
 export default function Home() {
@@ -26,9 +28,7 @@ export default function Home() {
   const filteredAnalyses = data?.pages.flat() || [];
 
   const handleCardClick = (analysis: Analysis) => {
-    // For now, we could open a modal or navigate to a detail page
-    // Since you mentioned individual pages, we could implement navigation later
-    console.log("Card clicked:", analysis);
+    dispatch(openModal(analysis));
   };
 
   const handleSearchClear = () => {
@@ -168,6 +168,9 @@ export default function Home() {
 
       {/* Analysis Modal */}
       <AnalysisModal />
+      
+      {/* Analysis Detail Modal */}
+      <AnalysisDetailModal />
     </div>
   );
 }

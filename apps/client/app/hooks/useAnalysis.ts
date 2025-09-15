@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-query";
 import useDebounce from "./useDebounce";
 import { useSearch } from "@/lib/redux/features/search/searchSlice";
-import { analysisAPI } from "@/lib/actions";
+import { analysisAPI } from "@/lib/api";
 import { Analysis, AnalysisRequest } from "@/lib/types";
 
 export const QUERY_KEYS = {
