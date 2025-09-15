@@ -18,5 +18,5 @@ def setup_logging():
         "<level>{level: <8}</level> | "
         "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>",
         colorize=True,
-        enqueue=True,  # For concurrent logging in multiprocess environments.
+        enqueue=True,
     )

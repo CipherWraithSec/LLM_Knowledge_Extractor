@@ -33,10 +33,10 @@ class LLMClient:
             yield {"content": json.dumps(mock_data), "logprobs": []}
             return
 
-        # Type guard: ensure client is not None
+        # Type guard: client cannot be None
         if self.client is None:
             raise llm_unavailable_error()
-        
+
         logger.info(
             f"Requesting analysis from OpenAI model: {self.model_name}")
 
@@ -55,7 +55,7 @@ class LLMClient:
             full_response_content = ""
             all_logprobs = []
             async for chunk in response_stream:
-                # choices is a list; take the first incremental delta
+                # choices is a list. take the first incremental delta
                 if getattr(chunk, "choices", None) and len(chunk.choices) > 0:
                     choice = chunk.choices[0]
                     # Content delta

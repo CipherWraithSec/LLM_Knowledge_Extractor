@@ -5,16 +5,15 @@ from typing import List
 from .logging import logger
 from spacy.cli.download import download
 
-# The path to the local SpaCy model within the project
-# This allows us to bundle the model with our codebase for reliability
+# The path to the local SpaCy model
 MODEL_PATH = Path(__file__).parent.parent.parent / "models" / \
     "en_core_web_sm" / "en_core_web_sm-3.8.0"
 
-# Initialize the SpaCy NLP pipeline with comprehensive fallback strategy
+# Initialize the SpaCy NLP pipeline
 nlp = None
 
 try:
-    # STEP 1: Try to load from local bundled model (most reliable)
+    # STEP 1: Try to load from local bundled model
     if MODEL_PATH.exists():
         logger.info(
             f"Loading SpaCy model from local bundled path: {MODEL_PATH}")
@@ -56,7 +55,6 @@ except Exception as e:
 def extract_nouns(text: str) -> List[str]:
     # Extracts the top 3 most frequent nouns from the input text using SpaCy.
 
-    # Check if SpaCy NLP pipeline is available
     if nlp is None:
         # Use simple word frequency analysis when SpaCy model loading fails
         logger.warning(
@@ -75,12 +73,12 @@ def extract_nouns(text: str) -> List[str]:
             if len(clean_word) > 3:
                 word_counts[clean_word] = word_counts.get(clean_word, 0) + 1
 
-        # Sort words by frequency (most frequent first) and return top 3
+        # Sort words by frequency, most frequent first and return top 3
         sorted_words = sorted(word_counts.items(),
                               key=lambda item: item[1], reverse=True)
         return [word for word, count in sorted_words[:3]]
 
-    # Use advanced linguistic analysis with SpaCy by processing text via SpaCy's NLP pipeline
+    #  Process text via SpaCy's NLP pipeline
     doc = nlp(text)
     noun_counts = {}
 
@@ -92,7 +90,7 @@ def extract_nouns(text: str) -> List[str]:
             noun_text = token.text.lower()
             noun_counts[noun_text] = noun_counts.get(noun_text, 0) + 1
 
-    # Sort nouns by frequency (descending order) to get most important ones first
+    # Sort nouns by frequency in descending order to get most important ones first
     sorted_nouns = sorted(noun_counts.items(),
                           key=lambda item: item[1], reverse=True)
 

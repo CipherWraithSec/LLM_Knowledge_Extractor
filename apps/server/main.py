@@ -14,7 +14,6 @@ setup_logging()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    # Connect to the database on startup and disconnect on shutdown.
     try:
         await connect_to_db()
         logger.info("Server is starting up.")

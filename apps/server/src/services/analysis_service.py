@@ -37,7 +37,7 @@ class AnalysisService:
         # 2. Calculate confidence score from logprobs
         confidence_score = None
         if all_logprobs:
-            # Average logprob per token. logprobs are negative, closer to 0 = higher confidence
+            # Average logprob per token. logprobs are negative so closer to 0 = higher confidence
             avg_logprob = sum(all_logprobs) / len(all_logprobs)
 
            # Convert to percentage confidence score (0-100)
@@ -81,11 +81,11 @@ class AnalysisService:
 
     async def search_analyses(self, query: str, limit: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
         # Search database for analyses based on a topic or keyword with pagination.
-        logger.info(f"Searching analyses for query: '{query}', limit: {limit}, offset: {offset}")
+        logger.info(
+            f"Searching analyses for query: '{query}', limit: {limit}, offset: {offset}")
 
         if query:
-            # Use raw SQL for optimal performance with PostgreSQL array operations
-            # This single query handles all search cases efficiently with pagination
+            # Raw SQL is used for optimal performance with PostgreSQL array operations
             search_sql = """
             SELECT * FROM "Analysis" 
             WHERE 
@@ -98,10 +98,10 @@ class AnalysisService:
             ORDER BY "createdAt" DESC
             LIMIT $2 OFFSET $3
             """
-            
+
             # Prepare the search pattern for ILIKE (case-insensitive partial match)
             search_pattern = f"%{query}%"
-            
+
             # Execute the optimized raw SQL query with pagination
             analyses = await self.prisma.query_raw(
                 search_sql,
@@ -110,7 +110,7 @@ class AnalysisService:
                 offset
             )
         else:
-            # No query - return all analyses (with reasonable ordering and pagination)
+            # No query so return all analyses with reasonable ordering and pagination
             analyses = await self.prisma.analysis.find_many(
                 skip=offset,
                 take=limit,
@@ -119,8 +119,7 @@ class AnalysisService:
             # Convert to list of dicts for consistency with raw query result
             analyses = [analysis.model_dump() for analysis in analyses]
 
-        logger.info(f"Found {len(analyses)} analyses for query: '{query}' (limit: {limit}, offset: {offset})")
-        
-        # For raw SQL results, they're already dicts
-        # For Prisma results (no query case), they're already converted above
+        logger.info(
+            f"Found {len(analyses)} analyses for query: '{query}' (limit: {limit}, offset: {offset})")
+
         return analyses
