@@ -80,6 +80,10 @@ docker-compose exec server prisma generate
 - **📚 API Docs**: http://localhost:8000/docs
 - **🗄️ Database**: localhost:5432
 
+## 🎯 Design Choices
+
+I chose a full-stack architecture with FastAPI and React to demonstrate both backend API and frontend UI capabilities within the time constraints. FastAPI provides automatic OpenAPI documentation and excellent async support for LLM streaming, while React Query handles data fetching with built-in caching and error handling. PostgreSQL with Prisma ORM enables complex search operations using raw SQL for optimal performance, particularly for the array-based topic/keyword matching with partial text search. The containerized approach with Docker Compose ensures consistent development and deployment environments, while the mock LLM mode allows development and testing without API costs. This architecture balances rapid development with production-ready patterns, creating a scalable foundation that could easily handle real-world usage.
+
 ## 📖 API Usage
 
 ### Analyze Text
