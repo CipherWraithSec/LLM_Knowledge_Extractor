@@ -1,36 +1,196 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🖥️ Next.js Client
 
-## Getting Started
+The frontend application for the LLM Knowledge Extractor, built with Next.js 15 and TypeScript.
 
-First, run the development server:
+## 🏗️ Architecture
+
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS (likely)
+- **API Integration**: REST API calls to FastAPI backend
+- **Containerization**: Docker for development and production
+
+## ✨ Features
+
+- **Text Analysis Interface**: User-friendly form for text input and analysis
+- **Results Display**: Comprehensive view of analysis results (topics, sentiment, keywords)
+- **Search Functionality**: Browse and search through previous analyses
+- **Responsive Design**: Works on desktop and mobile devices
+- **Real-time Updates**: Live connection with the backend API
+
+## 🚀 Quick Start
+
+### Using Docker (Recommended)
+
+From the project root directory:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Start all services including client
+docker-compose up -d --build
+
+# Access the application
+open http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Local Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Install dependencies
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Set up environment variables
+echo "NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1" > .env.local
 
-## Learn More
+# Start development server
+npm run dev
 
-To learn more about Next.js, take a look at the following resources:
+# Access the application
+open http://localhost:3000
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ⚙️ Configuration
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Environment variables for the client:
 
-## Deploy on Vercel
+```env
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1  # Backend API URL
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Environment Files
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `.env.local` - Local development overrides
+- `.env` - Default environment variables (in project root)
+
+## 📁 Project Structure
+
+```
+client/
+├── README.md              # This file
+├── package.json           # Node.js dependencies
+├── next.config.ts         # Next.js configuration
+├── tsconfig.json          # TypeScript configuration
+├── tailwind.config.ts     # Tailwind CSS configuration
+├── postcss.config.mjs     # PostCSS configuration
+├── Dockerfile             # Container configuration
+└── app/                   # Next.js App Router
+    ├── layout.tsx         # Root layout
+    ├── page.tsx           # Home page
+    ├── globals.css        # Global styles
+    └── components/        # React components (if any)
+```
+
+## 🔧 Development
+
+### Adding Dependencies
+
+```bash
+# Add production dependency
+docker-compose exec client npm install package-name
+
+# Add development dependency
+docker-compose exec client npm install --save-dev package-name
+
+# Or if working locally
+npm install package-name
+```
+
+### Available Scripts
+
+```bash
+# Development server with hot reload
+npm run dev
+
+# Production build
+npm run build
+
+# Start production server
+npm run start
+
+# Lint code
+npm run lint
+```
+
+### API Integration
+
+The client communicates with the FastAPI backend at `NEXT_PUBLIC_API_URL`.
+
+Example API calls:
+
+```typescript
+// Analyze text
+const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analyze`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ text: userInput })
+});
+
+// Search analyses
+const results = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/search?topic=keyword`);
+```
+
+## 🎨 UI Components
+
+### Planned/Potential Components
+
+- **TextAnalysisForm**: Input form for text analysis
+- **AnalysisResults**: Display analysis results
+- **SearchInterface**: Search through previous analyses
+- **LoadingSpinner**: Loading states
+- **ErrorBoundary**: Error handling
+
+## 🚀 Production Build
+
+```bash
+# Build for production
+docker-compose exec client npm run build
+
+# Or locally
+npm run build
+npm run start
+```
+
+### Production Deployment
+
+1. **Environment Variables**: Set production API URL
+2. **Build Optimization**: Next.js automatically optimizes for production
+3. **Static Assets**: Served efficiently with proper caching headers
+4. **Container**: Use production Dockerfile configuration
+
+## 🐛 Debugging
+
+### Development Tools
+
+- **Next.js Dev Tools**: Built-in debugging and error reporting
+- **React Developer Tools**: Browser extension for React debugging
+- **Network Tab**: Monitor API calls in browser dev tools
+
+### Common Issues
+
+- **API Connection**: Check NEXT_PUBLIC_API_URL and backend availability
+- **CORS Issues**: Ensure backend allows frontend origin
+- **Build Errors**: Check TypeScript compilation and import paths
+- **Styling Issues**: Verify Tailwind CSS configuration and classes
+
+### View Logs
+
+```bash
+# Client logs
+docker-compose logs -f client
+
+# Build logs
+docker-compose exec client npm run build
+```
+
+## 📚 Next.js Resources
+
+- [Next.js Documentation](https://nextjs.org/docs) - Learn about Next.js features and API
+- [Next.js Learn](https://nextjs.org/learn) - Interactive Next.js tutorial
+- [React Documentation](https://react.dev/) - Learn React concepts
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/) - TypeScript guide
+
+## 📚 Related Documentation
+
+- **[Project Overview](../../README.md)** - Full project setup and architecture
+- **[Server Documentation](../server/README.md)** - Backend API reference
+- **[Testing Documentation](../server/tests/README.md)** - API testing information

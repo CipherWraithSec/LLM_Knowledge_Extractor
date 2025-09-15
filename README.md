@@ -1,103 +1,212 @@
-# LLM Knowledge Extractor
+# 🧠 LLM Knowledge Extractor
 
-A multi-container project with:
+An intelligent text analysis platform that extracts meaningful insights from text using Large Language Models (LLMs). The system analyzes text for topics, sentiment, keywords, and provides confidence scores based on token probabilities.
 
-- Python FastAPI server (`apps/server`)
-- Next.js client (`apps/client`)
-- PostgreSQL database
+## 🏗️ Architecture
 
-## Prerequisites
+This is a full-stack application built with:
 
-- Docker & Docker Compose installed
-- `.env` file at project root with:
+- **Backend**: FastAPI server with Python ([`apps/server/`](./apps/server/README.md))
+- **Frontend**: Next.js React application ([`apps/client/`](./apps/client/README.md))  
+- **Database**: PostgreSQL with Prisma ORM
+- **AI/ML**: OpenAI GPT integration with mock mode for development
+- **Infrastructure**: Docker & Docker Compose
 
-  ```dotenv
-  # PostgreSQL
-  POSTGRES_USER=your_user
-  POSTGRES_PASSWORD=your_password
-  POSTGRES_DB=your_db
+## ✨ Features
 
-  # (Optional) Any other variables used by server or client
-  ```
+- **Text Analysis**: Extract topics, sentiment, and summaries from any text
+- **Confidence Scoring**: Calculate confidence scores using LLM token probabilities (logprobs)
+- **Keyword Extraction**: Local spaCy-based keyword extraction 
+- **Search & Discovery**: Search through analyzed content
+- **Mock Mode**: Development-friendly mock LLM responses
+- **Real-time API**: RESTful API with automatic documentation
 
-## Setup & Run (Development)
+## 🚀 Quick Start
 
-1. Clone the repo:
+### Prerequisites
 
-   ```bash
-   git clone https://github.com/your-org/LLM_Knowledge_Extractor.git
-   cd LLM_Knowledge_Extractor
-   ```
+- Docker & Docker Compose
+- OpenAI API key (optional for mock mode)
 
-2. Create and populate `.env` (see Prerequisites).
-
-3. Start all services with hot-reload:
-
-   ```bash
-   docker-compose up -d --build
-   ```
-
-4. Access services:
-   - Server (FastAPI): http://localhost:8000
-   - Client (Next.js): http://localhost:3000
-
-Changes to `apps/server` or `apps/client` are automatically reflected via Uvicorn and Next.js dev servers.
-
-## Database & Prisma
-
-1. Ensure your `.env` contains a `DATABASE_URL`, for example:
-
-   ```dotenv
-   DATABASE_URL=postgresql://your_user:your_password@db:5432/your_db
-   ```
-
-2. Create/apply migrations and generate the Prisma client:
-
-   ```bash
-   docker-compose exec server prisma migrate dev --schema=prisma/schema.prisma --name init
-   docker-compose exec server prisma generate --schema=prisma/schema.prisma
-   ```
-
-3. Use the generated client in your FastAPI code. A sample endpoint is available:
-   ```bash
-   curl http://localhost:8000/analyses
-   ```
-
-## Installing Dependencies
-
-### Client (Nextjs)
-
-Inside the running container:
+### 1. Clone & Setup
 
 ```bash
-docker-compose exec client npm install <package-name> --save
+git clone <your-repo-url>
+cd LLM_Knowledge_Extractor
 ```
 
-This updates `package.json` and installs into the container’s `node_modules`.
+### 2. Environment Configuration
 
-### Server (Python)
+Create a `.env` file in the root directory:
 
-Inside the running container:
+```env
+# Database
+POSTGRES_USER=brian
+POSTGRES_PASSWORD=brian123
+POSTGRES_DB=jouster_db
+DATABASE_URL=postgresql://brian:brian123@db:5432/jouster_db
 
+# LLM Configuration
+LLM_API_KEY=your_openai_api_key_here
+LLM_MOCK_ENABLED=true          # Set to false to use real OpenAI API
+LLM_MODEL=gpt-4o-mini
+LLM_MAX_TOKENS=1000
+LLM_TEMPERATURE=0.3
+
+# Frontend
+NEXT_PUBLIC_API_URL=http://server:8000/api/v1
+```
+
+### 3. Launch All Services
+
+```bash
+docker-compose up -d --build
+```
+
+### 4. Initialize Database
+
+```bash
+# Create database tables
+docker-compose exec server prisma migrate dev --name init
+
+# Generate Prisma client
+docker-compose exec server prisma generate
+```
+
+### 5. Access Applications
+
+- **🖥️ Frontend**: http://localhost:3000
+- **🚀 API Server**: http://localhost:8000
+- **📚 API Docs**: http://localhost:8000/docs
+- **🗄️ Database**: localhost:5432
+
+## 📖 API Usage
+
+### Analyze Text
+```bash
+curl -X POST http://localhost:8000/api/v1/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Artificial intelligence is transforming healthcare by enabling faster diagnoses and personalized treatments."
+  }'
+```
+
+### Search Analyses
+```bash
+curl "http://localhost:8000/api/v1/search?topic=healthcare"
+```
+
+### Example Response
+```json
+{
+  "id": 1,
+  "title": null,
+  "topics": ["artificial intelligence", "healthcare", "diagnosis"],
+  "sentiment": "positive",
+  "keywords": ["intelligence", "healthcare", "treatments"],
+  "summary": "AI is revolutionizing healthcare through improved diagnosis and personalized treatments.",
+  "original_text": "Artificial intelligence is transforming...",
+  "confidence_score": 94.5,
+  "createdAt": "2025-09-15T00:00:00Z"
+}
+```
+
+## 🧪 Testing
+
+Run the test suite to verify everything works:
+
+```bash
+# Simple integration tests
+docker-compose exec server python run_tests.py
+
+# Full test suite
+docker-compose exec server poetry run pytest tests/ -v
+```
+
+## 📁 Project Structure
+
+```
+LLM_Knowledge_Extractor/
+├── README.md                 # This file - project overview
+├── docker-compose.yml        # Multi-container configuration
+├── .env                      # Environment variables
+├── prisma/                   # Database schema & migrations
+│   └── schema.prisma
+└── apps/
+    ├── server/               # FastAPI backend
+    │   ├── README.md         # Server documentation
+    │   ├── src/              # Source code
+    │   ├── tests/            # Integration tests
+    │   └── run_tests.py      # Test runner
+    └── client/               # Next.js frontend
+        ├── README.md         # Client documentation
+        └── app/              # Next.js app directory
+```
+
+## 📚 Component Documentation
+
+- **[Server Documentation](./apps/server/README.md)** - API details, development, deployment
+- **[Client Documentation](./apps/client/README.md)** - Frontend setup, components, build process
+- **[Testing Documentation](./apps/server/tests/README.md)** - Test structure and execution
+
+## 🔧 Development
+
+### Adding Dependencies
+
+**Python (Server)**:
 ```bash
 docker-compose exec server poetry add <package-name>
-```
-
-Then restart the server to pick up new packages:
-
-```bash
 docker-compose restart server
 ```
 
-## Production
-
-For production builds:
-
+**Node.js (Client)**:
 ```bash
-# Client:
-docker-compose exec client npm run build
-# Server (rebuild image without --reload):
-docker-compose up -d --build server
+docker-compose exec client npm install <package-name>
 ```
 
-Remove `--reload` flag from the server command in `docker-compose.yml` for production.
+### Database Operations
+
+```bash
+# Reset database
+docker-compose exec server prisma db push --force-reset
+
+# View data
+docker-compose exec server prisma studio
+```
+
+### Logs & Debugging
+
+```bash
+# View all logs
+docker-compose logs -f
+
+# View specific service logs
+docker-compose logs -f server
+docker-compose logs -f client
+```
+
+## 🚀 Production Deployment
+
+For production deployment:
+
+1. Set `LLM_MOCK_ENABLED=false` in `.env`
+2. Provide real OpenAI API key
+3. Remove `--reload` from server command in `docker-compose.yml`
+4. Build production client: `docker-compose exec client npm run build`
+
+## 🤝 Contributing
+
+1. Follow the existing code structure
+2. Add tests for new features
+3. Update relevant README files
+4. Ensure all tests pass before submitting
+
+## 📄 License
+
+[Your License Here]
+
+## 🆘 Support
+
+- **Issues**: Create GitHub issues for bugs or feature requests
+- **API Docs**: Visit http://localhost:8000/docs for interactive API documentation
+- **Testing**: See [testing documentation](./apps/server/tests/README.md) for troubleshooting
