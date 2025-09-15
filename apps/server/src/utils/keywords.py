@@ -84,7 +84,7 @@ def extract_nouns(text: str) -> List[str]:
     doc = nlp(text)
     noun_counts = {}
 
-    # Iterate through each token/word in the processed document
+    # Iterate through each token in the processed document
     for token in doc:
         # Check if the token is classified as a noun by SpaCy's part-of-speech tagger
         if token.pos_ == "NOUN":

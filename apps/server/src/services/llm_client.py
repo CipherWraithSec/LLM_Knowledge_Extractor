@@ -1,11 +1,10 @@
-import os
-import httpx
 import json
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Dict, Any, Optional
 from openai import AsyncOpenAI
 from ..config import settings
 from ..utils.logging import logger
 from ..utils.errors import llm_unavailable_error
+from ..utils.prompts import get_analysis_messages
 
 
 class LLMClient:
@@ -14,67 +13,64 @@ class LLMClient:
     def __init__(self, api_key: str, mock_enabled: bool):
         self.mock_enabled = mock_enabled
         if not self.mock_enabled:
-            # Use AsyncOpenAI for non-blocking I/O.
-            self.client = AsyncOpenAI(api_key=api_key)
-            self.model_name = settings.llm_model  # Use the specified model
+            self.client: Optional[AsyncOpenAI] = AsyncOpenAI(api_key=api_key)
+            self.model_name = settings.llm_model
         else:
-            self.client = None
-            self.model_name = "mock_model"  # Fallback for mock
+            self.client: Optional[AsyncOpenAI] = None
+            self.model_name = "mock_model"
 
-    async def stream_analysis(self, text: str) -> AsyncGenerator[str, None]:
-       # Streams analysis results from the LLM as a generator of strings.
+    async def stream_analysis(self, text: str) -> AsyncGenerator[Dict[str, Any], None]:
+        # Streams analysis results from the LLM as a generator of dicts with content and logprobs.
         if self.mock_enabled:
             logger.info("Using mock LLM response.")
-            # Yields a complete, valid JSON string for mock response.
             mock_data = {
                 "summary": "This is a mock summary of the provided text, used for testing and development purposes. It simulates a fast, perfect response.",
                 "title": "Mock Analysis Title",
                 "topics": ["mocking", "testing", "development"],
-                "sentiment": "neutral",
-                "confidence_score": 0.95  # High confidence for mock data
+                "sentiment": "neutral"
             }
-            yield json.dumps(mock_data)
+            # Keep interface consistent with non-mock path
+            yield {"content": json.dumps(mock_data), "logprobs": []}
             return
 
+        # Type guard: ensure client is not None
+        if self.client is None:
+            raise llm_unavailable_error()
+        
         logger.info(
             f"Requesting analysis from OpenAI model: {self.model_name}")
 
         try:
             response_stream = await self.client.chat.completions.create(
                 model=self.model_name,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "You are a knowledge extractor. "
-                            "You will receive a block of text and must return a JSON object. "
-                            "The JSON must have these keys: 'summary', 'title', 'topics', 'sentiment', and 'confidence_score'. "
-                            "The summary should be 1-2 sentences. "
-                            "The title should be extracted from the text if available (or null if none). "
-                            "The topics array should contain 3 key topics from the text. "
-                            "The sentiment must be one of 'positive', 'neutral', or 'negative'. "
-                            "The confidence_score should be a float between 0.0 and 1.0 indicating your confidence in the analysis. "
-                            "Return only the raw JSON, without any other commentary."
-                        )
-                    },
-                    {"role": "user", "content": text}
-                ],
+                messages=get_analysis_messages(text),  # type: ignore
                 max_tokens=settings.llm_max_tokens,
                 temperature=settings.llm_temperature,
                 stream=True,
+                logprobs=True,
                 response_format={"type": "json_object"}
             )
 
-            # The AI SDK protocol uses a specific format (SSE), but we will handle parsing
-            # the chunks and yield them as a single JSON object once complete.
-            # For this simple task, waiting for the full response is fine, as it's small.
-            # For a more complex streaming protocol, this generator would yield SSE events.
-            full_response = ""
+            # For this simple task, we'll wait for the full response since it's small.
+            full_response_content = ""
+            all_logprobs = []
             async for chunk in response_stream:
-                if chunk.choices and chunk.choices[0].delta and chunk.choices[0].delta.content:
-                    full_response += chunk.choices[0].delta.content
+                # choices is a list; take the first incremental delta
+                if getattr(chunk, "choices", None) and len(chunk.choices) > 0:
+                    choice = chunk.choices[0]
+                    # Content delta
+                    if getattr(choice, "delta", None) and getattr(choice.delta, "content", None):
+                        content = choice.delta.content
+                        if content is not None:
+                            full_response_content += content
+                    # Logprobs per token
+                    if getattr(choice, "logprobs", None) and getattr(choice.logprobs, "content", None):
+                        for logprob_info in choice.logprobs.content:
+                            # Defensive: ensure attribute exists
+                            if hasattr(logprob_info, "logprob") and logprob_info.logprob is not None:
+                                all_logprobs.append(logprob_info.logprob)
 
-            yield full_response
+            yield {"content": full_response_content, "logprobs": all_logprobs}
 
         except Exception as e:
             logger.error(f"Error calling OpenAI API: {e}", exc_info=True)

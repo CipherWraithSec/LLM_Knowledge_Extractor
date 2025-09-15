@@ -17,4 +17,4 @@ class Settings(BaseSettings):
     llm_temperature: float
 
 
-settings = Settings()
+settings = Settings()  # type: ignore
