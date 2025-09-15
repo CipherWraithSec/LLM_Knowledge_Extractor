@@ -3,18 +3,21 @@
 import { Search, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useAppDispatch } from "@/app/hooks/redux";
+import { setQuery, useSearch } from "@/lib/redux/features/search/searchSlice";
+import { openModal } from "@/lib/redux/features/analysisModal/analysisModalSlice";
 
-interface HeaderProps {
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-  onNewAnalysis: () => void;
-}
+export function Header() {
+  const dispatch = useAppDispatch();
+  const { query: searchQuery } = useSearch();
 
-export function Header({
-  searchQuery,
-  onSearchChange,
-  onNewAnalysis,
-}: HeaderProps) {
+  const handleSearchChange = (query: string) => {
+    dispatch(setQuery(query));
+  };
+
+  const handleNewAnalysis = () => {
+    dispatch(openModal());
+  };
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className=" flex h-16 items-center justify-between px-4 md:px-6">
@@ -35,7 +38,7 @@ export function Header({
             <Input
               placeholder="Search analyses..."
               value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-9 pr-4"
             />
           </div>
@@ -43,7 +46,7 @@ export function Header({
 
         {/* New Analysis Button */}
         <Button
-          onClick={onNewAnalysis}
+          onClick={handleNewAnalysis}
           className="flex items-center space-x-2"
           size="sm"
         >

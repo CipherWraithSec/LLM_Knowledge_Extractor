@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import React from "react";
 import { X, Loader2 } from "lucide-react";
 import {
   Dialog,
@@ -12,39 +11,50 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { analysisAPI } from "@/lib/api";
 import {
-  Analysis,
   AnalysisRequestSchema,
   SENTIMENT_EMOJIS,
   getConfidenceColor,
   formatDate,
 } from "@/lib/types";
+import { useAppDispatch } from "@/app/hooks/redux";
+import {
+  closeModal,
+  setText,
+  setAnalyzing,
+  setResult,
+  setError,
+  useAnalysisModal,
+} from "@/lib/redux/features/analysisModal/analysisModalSlice";
+import { useCreateAnalysis } from "@/app/hooks/useAnalysis";
 
-interface AnalysisModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onAnalysisComplete?: (analysis: Analysis) => void;
-}
+export function AnalysisModal() {
+  const dispatch = useAppDispatch();
+  const { isOpen, text, result, isAnalyzing, error } = useAnalysisModal();
 
-export function AnalysisModal({
-  isOpen,
-  onClose,
-  onAnalysisComplete,
-}: AnalysisModalProps) {
-  const [text, setText] = useState("");
-  const [result, setResult] = useState<Analysis | null>(null);
+  // Use the comprehensive analysis creation hook
+  const analysisMutation = useCreateAnalysis();
 
-  const analysisMutation = useMutation({
-    mutationFn: analysisAPI.analyze,
-    onSuccess: (data) => {
-      setResult(data);
-      onAnalysisComplete?.(data);
-    },
-    onError: (error) => {
-      console.error("Analysis failed:", error);
-    },
-  });
+  // Sync mutation state with Redux
+  React.useEffect(() => {
+    dispatch(setAnalyzing(analysisMutation.isPending));
+    
+    if (analysisMutation.isSuccess && analysisMutation.data) {
+      dispatch(setResult(analysisMutation.data));
+    }
+    
+    if (analysisMutation.isError) {
+      const errorMessage = analysisMutation.error?.message || "Analysis failed";
+      dispatch(setError(errorMessage));
+    }
+  }, [
+    analysisMutation.isPending,
+    analysisMutation.isSuccess,
+    analysisMutation.isError,
+    analysisMutation.data,
+    analysisMutation.error,
+    dispatch,
+  ]);
 
   const handleAnalyze = () => {
     // Validate input
@@ -53,17 +63,18 @@ export function AnalysisModal({
       analysisMutation.mutate(validatedData);
     } catch (error) {
       console.error("Validation failed:", error);
+      dispatch(setError("Please enter valid text to analyze"));
     }
   };
 
   const handleClose = () => {
-    setText("");
-    setResult(null);
+    dispatch(closeModal());
     analysisMutation.reset();
-    onClose();
   };
 
-  const isAnalyzing = analysisMutation.isPending;
+  const handleTextChange = (newText: string) => {
+    dispatch(setText(newText));
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -91,7 +102,7 @@ export function AnalysisModal({
             <Textarea
               placeholder="Paste or type your text here..."
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={(e) => handleTextChange(e.target.value)}
               className="min-h-[200px] max-h-[300px] overflow-y-auto text-sm font-mono resize-none border-2 border-gray-300 focus:border-blue-500"
               disabled={isAnalyzing}
             />
@@ -186,11 +197,11 @@ export function AnalysisModal({
           )}
 
           {/* Error State */}
-          {analysisMutation.isError && (
+          {error && (
             <div className="px-4 pb-4">
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <div className="text-red-800">
-                  Analysis failed. Please try again or check your connection.
+                  {error}
                 </div>
               </div>
             </div>
