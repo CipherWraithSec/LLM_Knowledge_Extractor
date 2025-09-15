@@ -57,8 +57,8 @@ export function AnalysisModal({ isOpen, onClose, onAnalysisComplete }: AnalysisM
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-center text-2xl text-blue-600 font-bold">
             Text Analysis
           </DialogTitle>
@@ -70,7 +70,7 @@ export function AnalysisModal({ isOpen, onClose, onAnalysisComplete }: AnalysisM
           </button>
         </DialogHeader>
 
-        <div className="flex flex-col space-y-4 overflow-y-auto">
+        <div className="flex flex-col space-y-4 overflow-y-auto flex-1 min-h-0">
           {/* Description */}
           <div className="text-center text-gray-600 px-4">
             Input your text below, and our system will provide analysis including topics, sentiment, and summary!
@@ -82,7 +82,7 @@ export function AnalysisModal({ isOpen, onClose, onAnalysisComplete }: AnalysisM
               placeholder="Paste or type your text here..."
               value={text}
               onChange={(e) => setText(e.target.value)}
-              className="min-h-[200px] text-sm font-mono resize-none border-2 border-gray-300 focus:border-blue-500"
+              className="min-h-[200px] max-h-[300px] overflow-y-auto text-sm font-mono resize-none border-2 border-gray-300 focus:border-blue-500"
               disabled={isAnalyzing}
             />
           </div>
@@ -126,7 +126,7 @@ export function AnalysisModal({ isOpen, onClose, onAnalysisComplete }: AnalysisM
                 {/* Summary */}
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2">Summary:</h4>
-                  <div className="bg-white rounded-md p-4 border text-gray-700 leading-relaxed">
+                  <div className="bg-white rounded-md p-4 border text-gray-700 leading-relaxed max-h-[200px] overflow-y-auto">
                     {result.summary}
                   </div>
                 </div>
@@ -134,9 +134,9 @@ export function AnalysisModal({ isOpen, onClose, onAnalysisComplete }: AnalysisM
                 {/* Topics */}
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2">🏷️ Topics:</h4>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 max-h-[120px] overflow-y-auto">
                     {result.topics.map((topic, index) => (
-                      <Badge key={index} variant="secondary" className="bg-blue-100 text-blue-800">
+                      <Badge key={index} variant="secondary" className="bg-blue-100 text-blue-800 flex-shrink-0">
                         {topic}
                       </Badge>
                     ))}
@@ -146,7 +146,7 @@ export function AnalysisModal({ isOpen, onClose, onAnalysisComplete }: AnalysisM
                 {/* Keywords */}
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2">🔑 Keywords:</h4>
-                  <div className="text-gray-600">
+                  <div className="text-gray-600 max-h-[80px] overflow-y-auto">
                     {result.keywords.join(' • ')}
                   </div>
                 </div>
