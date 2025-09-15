@@ -41,9 +41,13 @@ async def analyze_text(
 async def search_analyses(
     topic: str = Query(
         None, description="Search analyses by a key topic or keyword."),
+    limit: int = Query(
+        50, ge=1, le=200, description="Maximum number of results to return (1-200)"),
+    offset: int = Query(
+        0, ge=0, description="Number of results to skip for pagination"),
     analysis_service: AnalysisService = Depends(get_analysis_service)
 ):
     # Searches for stored analyses matching a given topic or keyword.
     # Delegate the search logic to the service layer.
-    analyses = await analysis_service.search_analyses(topic)
+    analyses = await analysis_service.search_analyses(topic, limit=limit, offset=offset)
     return [AnalysisResult.model_validate(res) for res in analyses]

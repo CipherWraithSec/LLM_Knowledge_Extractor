@@ -1,3 +1,5 @@
+"use server";
+
 import axios from "axios";
 import { Analysis, AnalysisRequest } from "./types";
 
@@ -18,6 +20,13 @@ api.interceptors.response.use(
   }
 );
 
+// Search parameters interface
+export interface SearchParams {
+  query?: string;
+  limit?: number;
+  offset?: number;
+}
+
 // API functions
 export const analysisAPI = {
   // Analyze text
@@ -26,10 +35,26 @@ export const analysisAPI = {
     return response.data;
   },
 
-  // Search analyses
-  search: async (query?: string): Promise<Analysis[]> => {
-    const searchParams = query ? `?topic=${encodeURIComponent(query)}` : "";
-    const response = await api.get<Analysis[]>(`/search${searchParams}`);
+  // Search analyses with pagination support
+  search: async (params: SearchParams = {}): Promise<Analysis[]> => {
+    const searchParams = new URLSearchParams();
+
+    if (params.query) {
+      searchParams.append("topic", params.query);
+    }
+
+    if (params.limit !== undefined) {
+      searchParams.append("limit", params.limit.toString());
+    }
+
+    if (params.offset !== undefined) {
+      searchParams.append("offset", params.offset.toString());
+    }
+
+    const queryString = searchParams.toString();
+    const url = `/search${queryString ? `?${queryString}` : ""}`;
+
+    const response = await api.get<Analysis[]>(url);
     return response.data;
   },
 };

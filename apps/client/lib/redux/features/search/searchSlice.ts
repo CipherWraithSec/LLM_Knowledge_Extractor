@@ -8,6 +8,9 @@ const initialState: SearchState = {
     query: "",
   },
   isSearching: false,
+  pagination: {
+    limit: 10, // Default page size
+  },
 };
 
 const searchSlice = createSlice({
@@ -21,6 +24,9 @@ const searchSlice = createSlice({
     setSearching: (state, action: PayloadAction<boolean>) => {
       state.isSearching = action.payload;
     },
+    setPaginationLimit: (state, action: PayloadAction<number>) => {
+      state.pagination.limit = action.payload;
+    },
     clearSearch: (state) => {
       state.query = "";
       state.filters.query = "";
@@ -31,5 +37,10 @@ const searchSlice = createSlice({
 
 export const useSearch = () => useAppSelector((state) => state.search);
 
-export const { setQuery, setSearching, clearSearch } = searchSlice.actions;
+export const { 
+  setQuery, 
+  setSearching, 
+  setPaginationLimit, 
+  clearSearch 
+} = searchSlice.actions;
 export default searchSlice.reducer;

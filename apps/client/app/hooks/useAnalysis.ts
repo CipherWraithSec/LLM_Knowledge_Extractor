@@ -1,37 +1,52 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import useDebounce from "./useDebounce";
 import { useSearch } from "@/lib/redux/features/search/searchSlice";
-import { analysisAPI } from "@/lib/api";
+import { analysisAPI } from "@/lib/actions";
 import { Analysis, AnalysisRequest } from "@/lib/types";
 
 export const QUERY_KEYS = {
   analyses: "analyses",
   search: (query: string) => ["analyses", "search", query],
-  all: () => ["analyses", "search", "all"],
 } as const;
 
-// Search analyses
+// Search analyses with infinite scrolling
 export const useAnalysisQuery = () => {
-  const { query } = useSearch();
+  const { query, pagination } = useSearch();
 
   const debouncedSearch = useDebounce(query, 300);
-
   const normalizedQuery = debouncedSearch.trim();
 
-  // Dynamic query key based on search term
-  const queryKey = normalizedQuery
-    ? QUERY_KEYS.search(normalizedQuery)
-    : QUERY_KEYS.all();
-
-  return useQuery({
-    queryKey,
-    queryFn: () => analysisAPI.search(normalizedQuery || undefined),
-    staleTime: 5 * 60 * 1000, // 5 minutes - data considered fresh
-    gcTime: 10 * 60 * 1000, // 10 minutes - cache retention time
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: true,
+  return useInfiniteQuery({
+    queryKey: QUERY_KEYS.search(normalizedQuery),
+    queryFn: ({ pageParam = 0 }) => {
+      return analysisAPI.search({
+        query: normalizedQuery || undefined,
+        limit: pagination.limit,
+        offset: pageParam,
+      });
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages, lastPageParam) => {
+      // If the last page has fewer items than the limit, there are no more pages
+      if (lastPage.length < pagination.limit) {
+        return undefined; // No more pages
+      }
+      // Calculate next offset
+      const nextOffset = lastPageParam + pagination.limit;
+      return nextOffset;
+    },
+    getPreviousPageParam: (firstPage, allPages, firstPageParam) => {
+      return firstPageParam <= 0
+        ? undefined
+        : firstPageParam - pagination.limit;
+    },
   });
 };
 
@@ -48,16 +63,10 @@ export const useAnalysisMutation = () => {
         queryKey: [QUERY_KEYS.analyses, "search"],
         exact: false,
       });
-
-      // Optionally, optimistically update specific queries
-      // queryClient.setQueryData(QUERY_KEYS.all(), (oldData: Analysis[] | undefined) => {
-      //   return oldData ? [newAnalysis, ...oldData] : [newAnalysis];
-      // });
     },
 
     onError: (error) => {
       console.error("Failed to create analysis:", error);
-      // Could add toast notification here
     },
   });
 };
@@ -67,7 +76,7 @@ export const useAnalysis = (id: number, enabled = true) => {
   return useQuery({
     queryKey: [QUERY_KEYS.analyses, "single", id],
     queryFn: async () => {
-      const analyses = await analysisAPI.search();
+      const analyses = await analysisAPI.search({});
       const analysis = analyses.find((a) => a.id === id);
       if (!analysis) {
         throw new Error(`Analysis with ID ${id} not found`);

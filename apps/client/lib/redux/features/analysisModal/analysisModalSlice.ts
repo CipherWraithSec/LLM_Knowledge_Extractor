@@ -1,5 +1,5 @@
 import { useAppSelector } from "@/app/hooks/redux";
-import { Analysis, AnalysisModalState } from "@/lib/types";
+import { AnalysisModalState } from "@/lib/types";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: AnalysisModalState = {
@@ -28,9 +28,5 @@ const analysisModalSlice = createSlice({
 export const useAnalysisModal = () =>
   useAppSelector((state) => state.analysisModal);
 
-export const {
-  openModal,
-  closeModal,
-  setText,
-} = analysisModalSlice.actions;
+export const { openModal, closeModal, setText } = analysisModalSlice.actions;
 export default analysisModalSlice.reducer;

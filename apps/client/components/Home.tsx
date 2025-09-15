@@ -12,11 +12,18 @@ export default function Home() {
   const dispatch = useAppDispatch();
   const { query: searchQuery } = useSearch();
 
-  // Use server-side search with debouncing and caching
-  const { data: analyses = [], isLoading, error, refetch } = useAnalysisQuery();
+  const {
+    data,
+    isLoading,
+    error,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useAnalysisQuery();
 
-  // Server handles filtering, so we use analyses directly
-  const filteredAnalyses = analyses;
+  // Flatten all pages into a single array
+  const filteredAnalyses = data?.pages.flat() || [];
 
   const handleCardClick = (analysis: Analysis) => {
     // For now, we could open a modal or navigate to a detail page
@@ -126,6 +133,35 @@ export default function Home() {
                 />
               ))}
             </div>
+
+            {/* Load More Button */}
+            {(hasNextPage || isFetchingNextPage) && (
+              <div className="flex justify-center pt-6">
+                <button
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                >
+                  {isFetchingNextPage ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Loading more...
+                    </>
+                  ) : (
+                    "Load More Results"
+                  )}
+                </button>
+              </div>
+            )}
+
+            {/* End of results message */}
+            {!hasNextPage && filteredAnalyses.length > 0 && (
+              <div className="text-center pt-6">
+                <p className="text-gray-500 text-sm">
+                  🎉 You've reached the end of the results!
+                </p>
+              </div>
+            )}
           </div>
         )}
       </main>

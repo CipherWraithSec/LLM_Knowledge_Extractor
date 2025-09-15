@@ -79,23 +79,48 @@ class AnalysisService:
         # Convert Prisma object to dict for the API response
         return analysis.model_dump()
 
-    async def search_analyses(self, query: str) -> List[Dict[str, Any]]:
-        # Search database for analyses based on a topic or keyword.
-        logger.info(f"Searching analyses for query: '{query}'.")
+    async def search_analyses(self, query: str, limit: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
+        # Search database for analyses based on a topic or keyword with pagination.
+        logger.info(f"Searching analyses for query: '{query}', limit: {limit}, offset: {offset}")
 
-        # Build the where clause for Prisma query
         if query:
-            where_clause = {
-                "OR": [
-                    {"topics": {"has": query}},
-                    {"keywords": {"has": query}},
-                ]
-            }
+            # Use raw SQL for optimal performance with PostgreSQL array operations
+            # This single query handles all search cases efficiently with pagination
+            search_sql = """
+            SELECT * FROM "Analysis" 
+            WHERE 
+                -- Search in text fields (case-insensitive)
+                summary ILIKE $1
+                OR title ILIKE $1
+                -- Search in array fields using unnest for partial matching
+                OR EXISTS (SELECT 1 FROM unnest(topics) AS t WHERE t ILIKE $1)
+                OR EXISTS (SELECT 1 FROM unnest(keywords) AS k WHERE k ILIKE $1)
+            ORDER BY "createdAt" DESC
+            LIMIT $2 OFFSET $3
+            """
+            
+            # Prepare the search pattern for ILIKE (case-insensitive partial match)
+            search_pattern = f"%{query}%"
+            
+            # Execute the optimized raw SQL query with pagination
+            analyses = await self.prisma.query_raw(
+                search_sql,
+                search_pattern,
+                limit,
+                offset
+            )
         else:
-            where_clause = {}
+            # No query - return all analyses (with reasonable ordering and pagination)
+            analyses = await self.prisma.analysis.find_many(
+                skip=offset,
+                take=limit,
+                order={"createdAt": "desc"}
+            )
+            # Convert to list of dicts for consistency with raw query result
+            analyses = [analysis.model_dump() for analysis in analyses]
 
-        analyses = await self.prisma.analysis.find_many(where=where_clause)
-
-        logger.info(f"Found {len(analyses)} analyses for query: '{query}'.")
-        # Convert Prisma objects to dicts for the API response
-        return [analysis.model_dump() for analysis in analyses]
+        logger.info(f"Found {len(analyses)} analyses for query: '{query}' (limit: {limit}, offset: {offset})")
+        
+        # For raw SQL results, they're already dicts
+        # For Prisma results (no query case), they're already converted above
+        return analyses

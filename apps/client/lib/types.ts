@@ -35,6 +35,23 @@ export interface SearchFilters {
   dateTo?: string
 }
 
+// Pagination types
+export interface PaginationParams {
+  limit?: number
+  offset?: number
+}
+
+export interface SearchParams extends PaginationParams {
+  query?: string
+}
+
+// Infinite query pagination for React Query
+export interface InfiniteQueryPage {
+  data: Analysis[]
+  nextOffset?: number
+  hasMore: boolean
+}
+
 // UI state types
 export interface AnalysisModalState {
   isOpen: boolean
@@ -45,6 +62,9 @@ export interface SearchState {
   query: string
   filters: SearchFilters
   isSearching: boolean
+  pagination: {
+    limit: number
+  }
 }
 
 // Sentiment emoji mapping

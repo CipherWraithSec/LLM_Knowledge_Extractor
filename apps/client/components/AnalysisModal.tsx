@@ -32,7 +32,6 @@ export function AnalysisModal() {
   const { isOpen, text } = useAnalysisModal();
   const [result, setResult] = useState<Analysis | null>(null);
 
-  // Use the mutation hook directly
   const { mutate: analyzeText, isPending, error } = useAnalysisMutation();
 
   const handleAnalyze = () => {
