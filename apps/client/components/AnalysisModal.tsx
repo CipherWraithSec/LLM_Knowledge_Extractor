@@ -34,7 +34,16 @@ export function AnalysisModal() {
 
   const { mutate: analyzeText, isPending, error } = useAnalysisMutation();
 
+  // Check if current text has already been analyzed
+  const isTextAlreadyAnalyzed = result && result.original_text === text.trim();
+
   const handleAnalyze = () => {
+    // Prevent duplicate analysis
+    if (isTextAlreadyAnalyzed) {
+      toast.info("This text has already been analyzed!");
+      return;
+    }
+
     try {
       const validatedData = AnalysisRequestSchema.parse({ text });
       analyzeText(validatedData, {
@@ -61,6 +70,11 @@ export function AnalysisModal() {
 
   const handleTextChange = (newText: string) => {
     dispatch(setText(newText));
+
+    // Clear results if text has changed from what was analyzed
+    if (result && result.original_text !== newText.trim()) {
+      setResult(null);
+    }
   };
 
   return (
@@ -100,13 +114,19 @@ export function AnalysisModal() {
             <Button
               onClick={handleAnalyze}
               disabled={!text.trim() || isPending}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium text-lg"
+              className={`w-full py-3 text-white font-medium text-lg transition-colors ${
+                isTextAlreadyAnalyzed
+                  ? "bg-green-600 hover:bg-green-700"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }`}
             >
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Analyzing...
                 </>
+              ) : isTextAlreadyAnalyzed ? (
+                "✅ Analyzed"
               ) : (
                 "Analyze Text"
               )}

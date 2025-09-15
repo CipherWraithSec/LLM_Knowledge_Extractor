@@ -5,7 +5,7 @@ from typing import List
 from .logging import logger
 from spacy.cli.download import download
 
-# Define the path to the local SpaCy model within our project
+# The path to the local SpaCy model within the project
 # This allows us to bundle the model with our codebase for reliability
 MODEL_PATH = Path(__file__).parent.parent.parent / "models" / \
     "en_core_web_sm" / "en_core_web_sm-3.8.0"
