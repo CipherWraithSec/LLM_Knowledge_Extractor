@@ -156,17 +156,6 @@ LLM_Knowledge_Extractor/
 - **[Client Documentation](./apps/client/README.md)** - Frontend setup, components, build process
 - **[Testing Documentation](./apps/server/tests/README.md)** - Test structure and execution
 
-## 🚀 Production Deployment
+## 🚀 Demo
 
-For production deployment:
-
-1. Set `LLM_MOCK_ENABLED=false` in `.env`
-2. Provide real OpenAI API key
-3. Remove `--reload` from server command in `docker-compose.yml`
-4. Build production client: `docker-compose exec client npm run build`
-
-## 🆘 Support
-
-- **Issues**: Create GitHub issues for bugs or feature requests
-- **API Docs**: Visit http://localhost:8000/docs for interactive API documentation
-- **Testing**: See [testing documentation](./apps/server/tests/README.md) for troubleshooting
+- `You can view` - [Demo](https://www.loom.com/share/52466dac0ab84437b6eeb0ade0b8eae6?sid=8bbf84b1-907d-40f7-b384-57c190084bf6)
