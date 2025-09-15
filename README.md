@@ -1,13 +1,13 @@
 # 🧠 LLM Knowledge Extractor
 
-An intelligent text analysis platform that extracts meaningful insights from text using Large Language Models (LLMs). The system analyzes text for topics, sentiment, keywords, and provides confidence scores based on token probabilities.
+An intelligent text analysis platform that extracts meaningful insights from text using Large Language Models (LLMs). The system analyzes text for topics, sentiment, keywords, and provides a summary as well as confidence scores based on token probabilities.
 
 ## 🏗️ Architecture
 
 This is a full-stack application built with:
 
 - **Backend**: FastAPI server with Python ([`apps/server/`](./apps/server/README.md))
-- **Frontend**: Next.js React application ([`apps/client/`](./apps/client/README.md))  
+- **Frontend**: Next.js React application ([`apps/client/`](./apps/client/README.md))
 - **Database**: PostgreSQL with Prisma ORM
 - **AI/ML**: OpenAI GPT integration with mock mode for development
 - **Infrastructure**: Docker & Docker Compose
@@ -16,7 +16,7 @@ This is a full-stack application built with:
 
 - **Text Analysis**: Extract topics, sentiment, and summaries from any text
 - **Confidence Scoring**: Calculate confidence scores using LLM token probabilities (logprobs)
-- **Keyword Extraction**: Local spaCy-based keyword extraction 
+- **Keyword Extraction**: Local spaCy-based keyword extraction
 - **Search & Discovery**: Search through analyzed content
 - **Mock Mode**: Development-friendly mock LLM responses
 - **Real-time API**: RESTful API with automatic documentation
@@ -87,6 +87,7 @@ I chose a full-stack architecture with FastAPI and React to demonstrate both bac
 ## 📖 API Usage
 
 ### Analyze Text
+
 ```bash
 curl -X POST http://localhost:8000/api/v1/analyze \
   -H "Content-Type: application/json" \
@@ -96,11 +97,13 @@ curl -X POST http://localhost:8000/api/v1/analyze \
 ```
 
 ### Search Analyses
+
 ```bash
 curl "http://localhost:8000/api/v1/search?topic=healthcare"
 ```
 
 ### Example Response
+
 ```json
 {
   "id": 1,
@@ -158,12 +161,14 @@ LLM_Knowledge_Extractor/
 ### Adding Dependencies
 
 **Python (Server)**:
+
 ```bash
 docker-compose exec server poetry add <package-name>
 docker-compose restart server
 ```
 
 **Node.js (Client)**:
+
 ```bash
 docker-compose exec client npm install <package-name>
 ```
