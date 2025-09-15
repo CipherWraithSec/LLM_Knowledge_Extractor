@@ -26,9 +26,9 @@ export const analysisAPI = {
     return response.data;
   },
 
-  // Search analyses (replaces getAnalyses - empty query returns all)
+  // Search analyses
   search: async (query?: string): Promise<Analysis[]> => {
-    const searchParams = query ? `?topic=${encodeURIComponent(query)}` : '';
+    const searchParams = query ? `?topic=${encodeURIComponent(query)}` : "";
     const response = await api.get<Analysis[]>(`/search${searchParams}`);
     return response.data;
   },

@@ -36,7 +36,7 @@ export const useAnalysisQuery = () => {
 };
 
 // creating new analyses with automatic cache invalidation
-export const useCreateAnalysis = () => {
+export const useAnalysisMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({

@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import { useState } from "react";
 import { X, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
+  Analysis,
   AnalysisRequestSchema,
   SENTIMENT_EMOJIS,
   getConfidenceColor,
@@ -21,55 +23,41 @@ import { useAppDispatch } from "@/app/hooks/redux";
 import {
   closeModal,
   setText,
-  setAnalyzing,
-  setResult,
-  setError,
   useAnalysisModal,
 } from "@/lib/redux/features/analysisModal/analysisModalSlice";
-import { useCreateAnalysis } from "@/app/hooks/useAnalysis";
+import { useAnalysisMutation } from "@/app/hooks/useAnalysis";
 
 export function AnalysisModal() {
   const dispatch = useAppDispatch();
-  const { isOpen, text, result, isAnalyzing, error } = useAnalysisModal();
+  const { isOpen, text } = useAnalysisModal();
+  const [result, setResult] = useState<Analysis | null>(null);
 
-  // Use the comprehensive analysis creation hook
-  const analysisMutation = useCreateAnalysis();
-
-  // Sync mutation state with Redux
-  React.useEffect(() => {
-    dispatch(setAnalyzing(analysisMutation.isPending));
-    
-    if (analysisMutation.isSuccess && analysisMutation.data) {
-      dispatch(setResult(analysisMutation.data));
-    }
-    
-    if (analysisMutation.isError) {
-      const errorMessage = analysisMutation.error?.message || "Analysis failed";
-      dispatch(setError(errorMessage));
-    }
-  }, [
-    analysisMutation.isPending,
-    analysisMutation.isSuccess,
-    analysisMutation.isError,
-    analysisMutation.data,
-    analysisMutation.error,
-    dispatch,
-  ]);
+  // Use the mutation hook directly
+  const { mutate: analyzeText, isPending, error } = useAnalysisMutation();
 
   const handleAnalyze = () => {
-    // Validate input
     try {
       const validatedData = AnalysisRequestSchema.parse({ text });
-      analysisMutation.mutate(validatedData);
+      analyzeText(validatedData, {
+        onSuccess: (newAnalysis) => {
+          setResult(newAnalysis);
+          toast.success("Analysis completed successfully!");
+        },
+        onError: (error: any) => {
+          toast.error(error.message || "Analysis failed. Please try again.");
+        },
+      });
     } catch (error) {
-      console.error("Validation failed:", error);
-      dispatch(setError("Please enter valid text to analyze"));
+      toast.error("Please enter valid text to analyze");
     }
   };
 
-  const handleClose = () => {
-    dispatch(closeModal());
-    analysisMutation.reset();
+  // Handle modal close and reset state
+  const handleOnOpenChange = (open: boolean) => {
+    if (!open) {
+      setResult(null);
+      dispatch(closeModal());
+    }
   };
 
   const handleTextChange = (newText: string) => {
@@ -77,14 +65,14 @@ export function AnalysisModal() {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={handleOnOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-center text-2xl text-blue-600 font-bold">
             Text Analysis
           </DialogTitle>
           <button
-            onClick={handleClose}
+            onClick={() => handleOnOpenChange(false)}
             className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           >
             <X className="h-4 w-4" />
@@ -104,7 +92,7 @@ export function AnalysisModal() {
               value={text}
               onChange={(e) => handleTextChange(e.target.value)}
               className="min-h-[200px] max-h-[300px] overflow-y-auto text-sm font-mono resize-none border-2 border-gray-300 focus:border-blue-500"
-              disabled={isAnalyzing}
+              disabled={isPending}
             />
           </div>
 
@@ -112,10 +100,10 @@ export function AnalysisModal() {
           <div className="px-4">
             <Button
               onClick={handleAnalyze}
-              disabled={!text.trim() || isAnalyzing}
+              disabled={!text.trim() || isPending}
               className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium text-lg"
             >
-              {isAnalyzing ? (
+              {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Analyzing...
@@ -201,7 +189,7 @@ export function AnalysisModal() {
             <div className="px-4 pb-4">
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <div className="text-red-800">
-                  {error}
+                  {error.message || "Analysis failed. Please try again."}
                 </div>
               </div>
             </div>

@@ -13,12 +13,7 @@ export default function Home() {
   const { query: searchQuery } = useSearch();
 
   // Use server-side search with debouncing and caching
-  const {
-    data: analyses = [],
-    isLoading,
-    error,
-    refetch,
-  } = useAnalysisQuery();
+  const { data: analyses = [], isLoading, error, refetch } = useAnalysisQuery();
 
   // Server handles filtering, so we use analyses directly
   const filteredAnalyses = analyses;
@@ -76,7 +71,6 @@ export default function Home() {
               <p className="text-gray-600 mb-6">
                 Get started by analyzing your first piece of text
               </p>
-              {/* New Analysis button is now handled by Header component */}
             </div>
           )}
 

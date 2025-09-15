@@ -38,10 +38,7 @@ export interface SearchFilters {
 // UI state types
 export interface AnalysisModalState {
   isOpen: boolean
-  isAnalyzing: boolean
   text: string
-  result: Analysis | null
-  error: string | null
 }
 
 export interface SearchState {
