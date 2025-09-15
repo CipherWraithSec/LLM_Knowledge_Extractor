@@ -156,44 +156,6 @@ LLM_Knowledge_Extractor/
 - **[Client Documentation](./apps/client/README.md)** - Frontend setup, components, build process
 - **[Testing Documentation](./apps/server/tests/README.md)** - Test structure and execution
 
-## 🔧 Development
-
-### Adding Dependencies
-
-**Python (Server)**:
-
-```bash
-docker-compose exec server poetry add <package-name>
-docker-compose restart server
-```
-
-**Next.js (Client)**:
-
-```bash
-docker-compose exec client npm install <package-name>
-```
-
-### Database Operations
-
-```bash
-# Reset database
-docker-compose exec server prisma db push --force-reset
-
-# View data
-docker-compose exec server prisma studio
-```
-
-### Logs & Debugging
-
-```bash
-# View all logs
-docker-compose logs -f
-
-# View specific service logs
-docker-compose logs -f server
-docker-compose logs -f client
-```
-
 ## 🚀 Production Deployment
 
 For production deployment:
