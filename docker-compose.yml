@@ -41,7 +41,7 @@ services:
     # Set a command to run the FastAPI app with Uvicorn.
     # The `reload` flag should be used for development only.
     command: >
-      sh -c "prisma migrate dev --name dev && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+      sh -c "prisma generate && prisma migrate deploy && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
     # Mount the source code for hot-reloading in development
     volumes:
       - ./apps/server:/app:delegated
