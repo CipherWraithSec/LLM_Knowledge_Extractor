@@ -6,7 +6,9 @@ The frontend application for the LLM Knowledge Extractor, built with Next.js 15 
 
 - **Framework**: Next.js 15 with App Router
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS (likely)
+- **Styling**: Tailwind CSS
+- **UI State Manager**: Redux toolkit
+- **Cache and pagination**: React Query
 - **API Integration**: REST API calls to FastAPI backend
 - **Containerization**: Docker for development and production
 
@@ -120,24 +122,16 @@ Example API calls:
 ```typescript
 // Analyze text
 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analyze`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ text: userInput })
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ text: userInput }),
 });
 
 // Search analyses
-const results = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/search?topic=keyword`);
+const results = await fetch(
+  `${process.env.NEXT_PUBLIC_API_URL}/search?topic=keyword`
+);
 ```
-
-## 🎨 UI Components
-
-### Planned/Potential Components
-
-- **TextAnalysisForm**: Input form for text analysis
-- **AnalysisResults**: Display analysis results
-- **SearchInterface**: Search through previous analyses
-- **LoadingSpinner**: Loading states
-- **ErrorBoundary**: Error handling
 
 ## 🚀 Production Build
 
@@ -159,12 +153,6 @@ npm run start
 
 ## 🐛 Debugging
 
-### Development Tools
-
-- **Next.js Dev Tools**: Built-in debugging and error reporting
-- **React Developer Tools**: Browser extension for React debugging
-- **Network Tab**: Monitor API calls in browser dev tools
-
 ### Common Issues
 
 - **API Connection**: Check NEXT_PUBLIC_API_URL and backend availability
@@ -181,13 +169,6 @@ docker-compose logs -f client
 # Build logs
 docker-compose exec client npm run build
 ```
-
-## 📚 Next.js Resources
-
-- [Next.js Documentation](https://nextjs.org/docs) - Learn about Next.js features and API
-- [Next.js Learn](https://nextjs.org/learn) - Interactive Next.js tutorial
-- [React Documentation](https://react.dev/) - Learn React concepts
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/) - TypeScript guide
 
 ## 📚 Related Documentation
 

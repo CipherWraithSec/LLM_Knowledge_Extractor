@@ -135,12 +135,14 @@ LLM_TEMPERATURE=0.3                # Creativity level (0-2)
 ### Core Endpoints
 
 #### Health Check
+
 ```bash
 GET /
 # Response: {"message": "Server is running"}
 ```
 
 #### Analyze Text
+
 ```bash
 POST /api/v1/analyze
 Content-Type: application/json
@@ -151,6 +153,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "id": 1,
@@ -166,6 +169,7 @@ Content-Type: application/json
 ```
 
 #### Search Analyses
+
 ```bash
 GET /api/v1/search?topic=keyword
 # Returns array of matching analyses
@@ -203,7 +207,7 @@ See [Testing Documentation](./tests/README.md) for details.
 # Add production dependency
 docker-compose exec server poetry add package-name
 
-# Add development dependency  
+# Add development dependency
 docker-compose exec server poetry add --group dev package-name
 
 # Restart server to pick up changes
@@ -235,28 +239,23 @@ The codebase follows a layered architecture:
 ### Key Components
 
 #### LLM Client (`services/llm_client.py`)
+
 - Handles OpenAI API integration
 - Supports mock mode for development
 - Streams responses and extracts logprobs for confidence scoring
 
 #### Analysis Service (`services/analysis_service.py`)
+
 - Orchestrates text analysis workflow
 - Combines LLM results with local keyword extraction
 - Calculates confidence scores from logprobs
 - Persists results to database
 
 #### Prompts (`utils/prompts.py`)
+
 - Centralized prompt management
 - Easy to modify and version control
 - Supports different analysis types
-
-### Adding New Features
-
-1. **Define models** in `models/` for request/response schemas
-2. **Create service methods** in `services/` for business logic
-3. **Add API routes** in `api/v1/routes/` for HTTP endpoints
-4. **Write tests** in `tests/` for new functionality
-5. **Update documentation** in this README
 
 ## 🐛 Debugging
 
@@ -280,12 +279,6 @@ docker-compose logs -f server | grep ERROR
 **LLM Errors**: Verify API key and model availability, or enable mock mode
 **Port Conflicts**: Ensure port 8000 is available
 
-### Development Tools
-
-- **Database Browser**: http://localhost:8000/docs (Prisma Studio)
-- **API Explorer**: http://localhost:8000/docs (Swagger UI)
-- **Log Monitoring**: `docker-compose logs -f server`
-
 ## 🚀 Production Deployment
 
 ### Configuration
@@ -294,20 +287,6 @@ docker-compose logs -f server | grep ERROR
 2. Provide valid OpenAI API key
 3. Use production database URL
 4. Remove `--reload` from uvicorn command
-
-### Performance Considerations
-
-- **Database Connection Pooling**: Configure appropriate pool size
-- **LLM Rate Limits**: Implement request throttling if needed  
-- **Caching**: Consider Redis for frequently accessed data
-- **Monitoring**: Add health checks and metrics collection
-
-### Security
-
-- **Environment Variables**: Never commit API keys to version control
-- **Database Access**: Use least-privilege database users
-- **API Security**: Implement authentication/authorization as needed
-- **Input Validation**: All inputs are validated via Pydantic models
 
 ## 📚 Related Documentation
 
