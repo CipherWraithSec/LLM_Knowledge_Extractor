@@ -1,6 +1,3 @@
-"""
-Test configuration and fixtures.
-"""
 import pytest
 import asyncio
 import os
@@ -12,7 +9,7 @@ os.environ['LLM_MOCK_ENABLED'] = 'true'
 
 @pytest.fixture(scope="session")
 def event_loop():
-    """Create an instance of the default event loop for the test session."""
+    # Create an event loop for the session
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     yield loop
@@ -21,21 +18,20 @@ def event_loop():
 
 @pytest.fixture
 async def client():
-    """Create an async test client for the running server."""
-    # Test against the running server in the container
+    # An async test client for the running server
     async with AsyncClient(base_url="http://localhost:8000") as ac:
         yield ac
 
 
 @pytest.fixture
 def sample_text():
-    """Sample text for testing analysis."""
+    # Simple text for testing analysis.
     return "Artificial intelligence is transforming the healthcare industry by enabling faster diagnosis and personalized treatment plans."
 
 
 @pytest.fixture
 def complex_text():
-    """More complex text for testing."""
+    # More complex text for testing.
     return """
     Climate change represents one of the most significant challenges of our time. 
     Rising global temperatures, melting ice caps, and extreme weather events are clear indicators 
