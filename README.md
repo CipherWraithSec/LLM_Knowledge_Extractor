@@ -9,7 +9,7 @@ This is a full-stack application built with:
 - **Backend**: FastAPI server with Python ([`apps/server/`](./apps/server/README.md))
 - **Frontend**: Next.js React application ([`apps/client/`](./apps/client/README.md))
 - **Database**: PostgreSQL with Prisma ORM
-- **AI/ML**: OpenAI GPT integration with mock mode for development
+- **AI/ML**: OpenAI GPT integration with optional mock mode for development
 - **Infrastructure**: Docker & Docker Compose
 
 ## ✨ Features
@@ -18,12 +18,12 @@ This is a full-stack application built with:
 - **Confidence Scoring**: Calculate confidence scores using LLM token probabilities (logprobs)
 - **Keyword Extraction**: Local spaCy-based keyword extraction
 - **Search & Discovery**: Search through analyzed content
-- **Mock Mode**: Development-friendly mock LLM responses
+- **Mock Mode**: Development-friendly mock LLM responses (optional)
 - **Real-time API**: RESTful API with automatic documentation
 
 ## 🎯 Design Choices
 
-FastAPI provides automatic OpenAPI documentation and excellent async support for LLM streaming, while React Query handles data fetching with built-in caching and error handling. The system implements confidence scoring using OpenAI's logprobs (token probabilities) for mathematically grounded uncertainty quantification, and uses spaCy for local keyword extraction to identify the most frequent nouns without requiring additional LLM calls. PostgreSQL with Prisma ORM enables complex search operations using raw SQL for optimal performance, particularly for the array-based topic/keyword matching with partial text search. The containerized approach with Docker Compose ensures consistent development and deployment environments, while the mock LLM mode allows development and testing without API costs.
+FastAPI provides automatic OpenAPI documentation and excellent async support for LLM streaming, while React Query handles data fetching with built-in caching and error handling. The system implements confidence scoring using OpenAI's logprobs (token probabilities) for mathematically grounded uncertainty quantification, and uses spaCy for local keyword extraction to identify the most frequent nouns without requiring additional LLM calls. PostgreSQL with Prisma ORM supports a type-safe data access layer and enables complex search operations using raw SQL for optimal performance, particularly for the array-based topic/keyword matching with partial text search. The containerized approach with Docker Compose ensures consistent development and deployment environments, while the mock LLM mode allows development and testing without API costs.
 
 ## 🚀 Quick Start
 
