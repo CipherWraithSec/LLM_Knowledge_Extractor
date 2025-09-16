@@ -9,7 +9,7 @@ export interface Analysis {
   keywords: string[]
   summary: string
   original_text: string
-  confidence_score: number
+  confidence_score: number | null
   createdAt: string
 }
 
@@ -75,7 +75,8 @@ export const SENTIMENT_EMOJIS: Record<string, string> = {
 }
 
 // Confidence level colors
-export const getConfidenceColor = (score: number): string => {
+export const getConfidenceColor = (score: number | null): string => {
+  if (score === null) return 'text-gray-500'
   if (score >= 90) return 'text-green-600'
   if (score >= 70) return 'text-yellow-600'
   return 'text-red-600'

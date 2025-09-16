@@ -29,8 +29,9 @@ class LLMClient:
                 "topics": ["mocking", "testing", "development"],
                 "sentiment": "neutral"
             }
-            # Keep interface consistent with non-mock path
-            yield {"content": json.dumps(mock_data), "logprobs": []}
+            # Keep interface consistent with non-mock path - include fake logprobs for confidence score
+            fake_logprobs = [-0.1, -0.15, -0.08, -0.12, -0.09]  # Mock realistic logprobs
+            yield {"content": json.dumps(mock_data), "logprobs": fake_logprobs}
             return
 
         # Type guard: client cannot be None

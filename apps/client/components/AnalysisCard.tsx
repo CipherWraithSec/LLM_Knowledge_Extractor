@@ -66,7 +66,10 @@ export function AnalysisCard({ analysis, onClick }: AnalysisCardProps) {
             </span>
           </div>
           <div className={`text-sm font-medium ${getConfidenceColor(analysis.confidence_score)}`}>
-            {analysis.confidence_score.toFixed(1)}% Confidence
+            {analysis.confidence_score != null 
+              ? `${analysis.confidence_score.toFixed(1)}% Confidence`
+              : 'No Confidence Score'
+            }
           </div>
         </div>
       </CardContent>

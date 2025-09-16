@@ -154,7 +154,10 @@ export function AnalysisModal() {
                         result.confidence_score
                       )}`}
                     >
-                      {result.confidence_score.toFixed(1)}% Confidence
+                      {result.confidence_score != null
+                        ? `${result.confidence_score.toFixed(1)}% Confidence`
+                        : 'No Confidence Score'
+                      }
                     </div>
                   </div>
                 </div>
